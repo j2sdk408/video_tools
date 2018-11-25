@@ -109,7 +109,8 @@ class SrtInfo(object):
 if __name__ == "__main__":
 
     #file_name = "Chicago_BDRip_1080p_CRUSADERS.srt"
-    file_name = "old.srt"
+    #file_name = "old.srt"
+    file_name = sys.argv[1]
 
     with open(file_name, "r") as f:
         content = f.read().splitlines()
