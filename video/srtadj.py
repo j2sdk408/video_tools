@@ -12,14 +12,24 @@ class SrtLine(object):
         """initializer"""
 
         self.idx = idx
+        # int: number of line
+
         self.time_st = ""
+        # str: start time string
+
         self.time_ed = ""
+        # str: end time string
+
         self.lines = []
+        # list of str: subtitle strings
 
     def get_time(self, offset=0, scale=1):
         """print adjusted time string
-        offset: unit: ms, + means delay
-        scale: shorten/stretch time
+        Args:
+            offset(float): unit: ms, + means delay
+            scale(float): shorten/stretch time
+        Returns:
+            str: adjusted, formatted time string representation
         """
 
         time_out = []
@@ -51,8 +61,15 @@ class SrtInfo(object):
         """initializer"""
 
         self.srt_list = []
+        # list of SrtInfo: subtitle items
+
         self.offset = 0
+        # float: offset to be applied
+        #   - 0 means no delay
+
         self.scale = 1
+        # float: scaler to be applied
+        #   - 1 means no scale
 
     def __str__(self):
         """to string"""
