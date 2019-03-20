@@ -9,7 +9,10 @@ from scipy import signal
 # mplayer -ao pcm -af format=s16le -vo null input.mp4
 
 def get_raw(wav_name):
-    """get raw data from wave file"""
+    """get raw data from wave file
+    Args:
+        wav_name(str): wave file
+    """
 
     f_wav = wave.open(wav_name, "rb")
 
