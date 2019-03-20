@@ -94,7 +94,10 @@ class SrtInfo(object):
         return "\n".join(out_list)
 
     def load(self, content_list):
-        """parse .srt from content list"""
+        """parse .srt from content list
+        Args:
+            content_list(list of str): content
+        """
 
         self.srt_list = []
         state = 0
