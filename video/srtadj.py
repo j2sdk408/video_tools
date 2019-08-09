@@ -1,6 +1,8 @@
 """adjust .srt scaler & offset
 """
 
+# pylint: disable=invalid-name
+
 import re
 import sys
 
@@ -93,6 +95,23 @@ class SrtInfo(object):
 
         return "\n".join(out_list)
 
+    @classmethod
+    def load_file(cls, srt_path):
+        """load srt file
+        Args:
+            srt_path(str)
+        Returns:
+            cls:
+        """
+
+        with open(srt_path, "r") as f:
+            content = f.read().splitlines()
+
+        sf = SrtInfo()
+        sf.load(content)
+
+        return sf
+
     def load(self, content_list):
         """parse .srt from content list
         Args:
@@ -103,14 +122,14 @@ class SrtInfo(object):
         state = 0
         line_cnt = 1
 
-        for idx, line in enumerate(content_list):
+        for line in content_list:
             if state == 0 and line:
                 try:
                     if int(line) == line_cnt:
                         self.srt_list.append(SrtLine(line_cnt))
                         line_cnt += 1
                         state = 1
-                except:
+                except ValueError:
                     break
 
             elif state == 1:
@@ -125,36 +144,69 @@ class SrtInfo(object):
                 else:
                     state = 0
 
+    @staticmethod
+    def str2sec(time_str):
+        """convert time str into seconds
+        Args:
+            time_str(str):
+            - format: 00:01:38,832
+        Returns:
+            float: seconds
+        """
 
-if __name__ == "__main__":
+        total_sec = 0
+
+        hour_str, min_str, sec_str = time_str.split(":")
+
+        sec_str = sec_str.replace(",")
+
+        total_sec = int(hour_str) *  3600 + int(min_str) * 60 + float(sec_str) / 1000
+
+        return total_sec
+
+    def correct(self, time_old, time_correct):
+        """adjust offset and scale to correct time
+        Args:
+            time_old(tuple of str)
+                - (time start, time end)
+            time_correct(tuple of str)
+                - (time start, time end)
+        """
+
+        st_old, ed_old = time_old
+        st_new, ed_new = time_correct
+        # str
+        #   - format: 00:01:38,832
+
+        t_st1 = self.str2sec(st_old)
+        t_st2 = self.str2sec(st_new)
+        t_ed1 = self.str2sec(ed_old)
+        t_ed2 = self.str2sec(ed_new)
+
+        t1 = t_st1
+        d1 = (t_st1 - t_st2) * 1000
+
+        t2 = t_ed1
+        d2 = (t_ed1 - t_ed2) * 1000
+
+        self.offset = -(d1 + (d1 - d2) / (t2 - t1) * t1)
+        self.scale = (1. - (d2 - d1) / (t2 - t1) / 1000)
+
+def main():
+    """main flow
+    """
 
     #file_name = "old.srt"
     file_name = sys.argv[1]
 
-    with open(file_name, "r") as f:
-        content = f.read().splitlines()
+    sf = SrtInfo.load_file(file_name)
 
-    sf = SrtInfo()
-    sf.load(content)
-
-    # 00:03:10,620 : old
-    # 00:03:12,097 : standard
-    t_st1 = (3) * 60 + 10.620
-    t_st2 = (3) * 60 + 12.097
-
-    # 01:48:54,600 : old
-    # 01:48:56,268 : standard
-    t_ed1 = 1 * 60 * 60 + 48 * 60 + 54.600
-    t_ed2 = 1 * 60 * 60 + 48 * 60 + 56.268
-
-    t1 = t_st1
-    d1 = (t_st1 - t_st2) * 1000
-
-    t2 = t_ed1
-    d2 = (t_ed1 - t_ed2) * 1000
-
-    sf.offset = -(d1 + (d1 - d2) / (t2 - t1) * t1)
-    sf.scale = (1. - (d2 - d1) / (t2 - t1) / 1000)
+    sf.correct(
+        ("00:03:10,620", "01:48:54,600"), # old
+        ("00:03:12,097", "01:48:56,268"), # correct
+    )
 
     print str(sf)
 
+if __name__ == "__main__":
+    main()
