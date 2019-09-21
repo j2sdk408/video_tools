@@ -158,7 +158,7 @@ class SrtInfo(object):
 
         hour_str, min_str, sec_str = time_str.split(":")
 
-        sec_str = sec_str.replace(",")
+        sec_str = sec_str.replace(",", "")
 
         total_sec = int(hour_str) *  3600 + int(min_str) * 60 + float(sec_str) / 1000
 
