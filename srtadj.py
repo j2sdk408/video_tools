@@ -192,6 +192,72 @@ class SrtInfo(object):
         self.offset = -(d1 + (d1 - d2) / (t2 - t1) * t1)
         self.scale = (1. - (d2 - d1) / (t2 - t1) / 1000)
 
+    @classmethod
+    def merge(cls, srt_list, allow_duplicate=True):
+        """merge srt files
+        Args:
+            srt_list(list of cls):
+            allow_duplicate(bool): True to allow duplicate lines
+        Returns:
+            cls: merged cls
+        """
+
+        assert len(srt_list) >= 2
+
+        new_srt = cls()
+        base_srt = srt_list[0]
+
+        search_base_list = [0] * len(srt_list)
+        # list of int: previously searched item
+
+        for item in base_srt.srt_list:
+
+            for srt_idx in xrange(1, len(srt_list)):
+                insert_srt = srt_list[srt_idx]
+
+                line_idx = search_base_list[srt_idx]
+
+                while line_idx < len(insert_srt.srt_list):
+
+                    insert_item = insert_srt.srt_list[line_idx]
+
+                    # check for overlap
+                    if insert_item.time_ed <= item.time_st:
+                        line_idx += 1
+                        continue
+                    if insert_item.time_st >= item.time_ed:
+                        break
+
+                    # append lines
+                    item.lines += insert_item.lines
+                    line_idx += 1
+
+                if not allow_duplicate:
+                    search_base_list[srt_idx] = line_idx
+
+            new_srt.srt_list.append(item)
+
+        return new_srt
+
+def merge_srt():
+    """merge srt
+    """
+
+    base_name = "en.srt"
+    insert_name = "zh3.srt"
+
+    srt_list = [
+        SrtInfo.load_file(base_name),
+        SrtInfo.load_file(insert_name),
+    ]
+
+    sf_new = SrtInfo.merge(
+        srt_list,
+        allow_duplicate=False,
+    )
+
+    print str(sf_new)
+
 def main():
     """main flow
     """
