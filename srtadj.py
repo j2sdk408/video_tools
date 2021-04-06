@@ -7,7 +7,7 @@ import re
 import sys
 
 
-class SrtLine(object):
+class SrtLine:
     """class for single line in .srt"""
 
     def __init__(self, idx):
@@ -56,7 +56,7 @@ class SrtLine(object):
         return time_out
 
 
-class SrtInfo(object):
+class SrtInfo:
     """class for whole .srt file"""
 
     def __init__(self):
@@ -212,7 +212,7 @@ class SrtInfo(object):
 
         for item in base_srt.srt_list:
 
-            for srt_idx in xrange(1, len(srt_list)):
+            for srt_idx in range(1, len(srt_list)):
                 insert_srt = srt_list[srt_idx]
 
                 line_idx = search_base_list[srt_idx]
@@ -256,7 +256,7 @@ def merge_srt():
         allow_duplicate=False,
     )
 
-    print str(sf_new)
+    print(sf_new)
 
 def main():
     """main flow
@@ -272,7 +272,7 @@ def main():
         ("00:03:12,097", "01:48:56,268"), # correct
     )
 
-    print str(sf)
+    print(sf)
 
 if __name__ == "__main__":
     main()

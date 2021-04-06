@@ -48,26 +48,25 @@ def merge_ts(target_dir="."):
     merged_file = "merged.ts"
     output_file = "out.mp4"
 
-    print "Generationg config.txt"
+    print("Generationg config.txt")
     gen_config(config_name)
 
-    print "Merging..."
+    print("Merging...")
     cmd = "ffmpeg -f concat -i %s -c copy %s" % (
         config_name,
         merged_file
     )
     subprocess.call(cmd, shell=True)
 
-    print "Transcoding..."
+    print("Transcoding...")
     cmd = "ffmpeg -i %s -acodec copy -vcodec copy %s" % (
         merged_file,
         output_file
     )
     subprocess.call(cmd, shell=True)
 
-    print "Done"
+    print("Done")
 
 
 if __name__ == "__main__":
     merge_ts()
-
